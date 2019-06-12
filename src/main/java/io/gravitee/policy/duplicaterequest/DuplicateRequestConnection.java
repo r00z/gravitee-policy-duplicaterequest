@@ -84,7 +84,11 @@ public class DuplicateRequestConnection implements ProxyConnection {
                 logger.info("Server exception", event);
             });
 
-            clientRequest.write(messageBody);
+            if (!messageBody.isEmpty() && (originalRequest.method().equals(io.gravitee.common.http.HttpMethod.POST)
+                                            || originalRequest.method().equals(io.gravitee.common.http.HttpMethod.PUT)
+                                            || originalRequest.method().equals(io.gravitee.common.http.HttpMethod.PATCH))) {
+                clientRequest.write(messageBody);
+            }
             clientRequest.end();
         } catch (MalformedURLException e) {
             logger.error("Invalid URL: " + url);
