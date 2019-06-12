@@ -32,9 +32,11 @@ import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 
 public class DuplicateRequestConnection implements ProxyConnection {
     private static final Logger logger = LoggerFactory.getLogger(DuplicateRequestConnection.class);
+
     private final HttpClient httpClient;
     private final Request originalRequest;
 
@@ -61,23 +63,27 @@ public class DuplicateRequestConnection implements ProxyConnection {
     @Override
     public void end() {
         String messageBody = (content != null) ? content.toString() : "";
-        logger.info("Message body: " + messageBody + ", url: " + url + ", method: " + HttpMethod.valueOf(originalRequest.method().name()));
+        HttpMethod httpMethod = HttpMethod.valueOf(originalRequest.method().name());
+        logger.info("Message body: " + messageBody + ", url: " + url + ", method: " + httpMethod);
         try {
             URL urlObject = new URL(url);
 
-            HttpClientRequest clientRequest = httpClient.request(HttpMethod.valueOf(originalRequest.method().name()), urlObject.getPort(), urlObject.getHost(), urlObject.getPath());
-            MultiMap headers = clientRequest.headers();
-            if (originalRequest.headers() != null && !originalRequest.headers().isEmpty()) {
-                originalRequest.headers().forEach(headers::set);
-            }
-            clientRequest.connectionHandler(connection -> {
-                connection.exceptionHandler(ex -> {
-                    logger.info("Connection exception ");
+            HttpClientRequest clientRequest = httpClient.requestAbs(httpMethod, url, done -> {
+                logger.info("Response code: " + done.statusCode() + ", statusMessage: " + done.statusMessage() );
+                done.bodyHandler(buffer -> {
+                    logger.info("Body: " + buffer.getString(0, buffer.length()));
                 });
             });
 
-            clientRequest.handler(done -> {
-                logger.info("Response code: " + done.statusCode());
+            MultiMap headers = clientRequest.headers();
+            if (originalRequest.headers() != null && !originalRequest.headers().isEmpty()) {
+                Map<String, String> originalHeaders = originalRequest.headers().toSingleValueMap();
+                headers.setAll(originalHeaders);
+            }
+            clientRequest.connectionHandler(connection -> {
+                connection.exceptionHandler(ex -> {
+                    logger.error("Connection exception ", ex);
+                });
             });
 
             clientRequest.exceptionHandler(event -> {
@@ -92,6 +98,8 @@ public class DuplicateRequestConnection implements ProxyConnection {
             clientRequest.end();
         } catch (MalformedURLException e) {
             logger.error("Invalid URL: " + url);
+        } catch (Exception e) {
+            logger.error("General exception: ", e);
         }
 
         responseHandler.handle(new DuplicateRequestResponse());
