@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.gravitee.policy.duplicaterequest;
+package io.gravitee.policy.requestmirror;
 
 import io.gravitee.common.http.HttpHeaders;
 import io.gravitee.gateway.api.buffer.Buffer;
@@ -21,10 +21,9 @@ import io.gravitee.gateway.api.handler.Handler;
 import io.gravitee.gateway.api.proxy.ProxyResponse;
 import io.gravitee.gateway.api.stream.ReadStream;
 
-public class DuplicateRequestResponse implements ProxyResponse {
+public class RequestMirrorResponse implements ProxyResponse {
     protected Handler<Buffer> bodyHandler;
     protected Handler<Void> endHandler;
-    private Buffer buffer;
 
     @Override
     public int status() {
@@ -50,10 +49,6 @@ public class DuplicateRequestResponse implements ProxyResponse {
 
     @Override
     public ReadStream<Buffer> resume() {
-        if (buffer != null) {
-            bodyHandler.handle(buffer);
-        }
-
         endHandler.handle(null);
         return this;
     }

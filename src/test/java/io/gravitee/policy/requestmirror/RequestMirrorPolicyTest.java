@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.gravitee.policy.duplicaterequest;
+package io.gravitee.policy.requestmirror;
 
 import org.junit.Test;
 
-public class DuplicateRequestPolicyTest {
+public class RequestMirrorPolicyTest {
 
     @Test
     public void testOnRequest() throws Exception {

@@ -13,27 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.gravitee.policy.duplicaterequest;
+package io.gravitee.policy.requestmirror;
 
 import io.gravitee.gateway.api.ExecutionContext;
 import io.gravitee.gateway.api.Invoker;
-import io.gravitee.gateway.api.Request;
 import io.gravitee.gateway.api.buffer.Buffer;
 import io.gravitee.gateway.api.handler.Handler;
 import io.gravitee.gateway.api.proxy.ProxyConnection;
 import io.gravitee.gateway.api.stream.ReadStream;
 
-public class DuplicateRequestInvoker implements Invoker {
-    private final DuplicateRequestPolicyConfiguration configuration;
+public class RequestMirrorInvoker implements Invoker {
+    private final RequestMirrorPolicyConfiguration configuration;
 
-    public DuplicateRequestInvoker(DuplicateRequestPolicyConfiguration configuration) {
+    public RequestMirrorInvoker(RequestMirrorPolicyConfiguration configuration) {
         this.configuration = configuration;
     }
 
     @Override
     public void invoke(ExecutionContext executionContext, ReadStream<Buffer> readStream, Handler<ProxyConnection> connectionHandler) {
 
-        final DuplicateRequestConnection connection = new DuplicateRequestConnection(executionContext, configuration);
+        final RequestMirrorConnection connection = new RequestMirrorConnection(executionContext, configuration);
 
         // Return connection to backend
         connectionHandler.handle(connection);

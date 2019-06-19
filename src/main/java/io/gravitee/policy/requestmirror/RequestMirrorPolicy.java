@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.gravitee.policy.duplicaterequest;
+package io.gravitee.policy.requestmirror;
 
 import io.gravitee.common.http.HttpStatusCode;
 import io.gravitee.gateway.api.ExecutionContext;
@@ -25,26 +25,26 @@ import io.gravitee.policy.api.annotations.OnRequest;
 import io.gravitee.policy.api.annotations.OnResponse;
 
 @SuppressWarnings("unused")
-public class DuplicateRequestPolicy {
+public class RequestMirrorPolicy {
 
     /**
      * The associated configuration to this DuplicateRequest Policy
      */
-    private DuplicateRequestPolicyConfiguration configuration;
+    private RequestMirrorPolicyConfiguration configuration;
 
     /**
      * Create a new DuplicateRequest Policy instance based on its associated configuration
      *
      * @param configuration the associated configuration to the new DuplicateRequest Policy instance
      */
-    public DuplicateRequestPolicy(DuplicateRequestPolicyConfiguration configuration) {
+    public RequestMirrorPolicy(RequestMirrorPolicyConfiguration configuration) {
         this.configuration = configuration;
     }
 
 
     @OnRequest
     public void onRequest(Request request, Response response, ExecutionContext executionContext, PolicyChain policyChain) {
-        executionContext.setAttribute(ExecutionContext.ATTR_INVOKER, new DuplicateRequestInvoker(configuration));
+        executionContext.setAttribute(ExecutionContext.ATTR_INVOKER, new RequestMirrorInvoker(configuration));
 
         // Finally continue chaining
         policyChain.doNext(request, response);

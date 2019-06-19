@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.gravitee.policy.duplicaterequest;
+package io.gravitee.policy.requestmirror;
 
 import io.gravitee.gateway.api.Request;
 import io.vertx.core.MultiMap;
@@ -34,8 +34,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
-public class DuplicateRequestConnection implements ProxyConnection {
-    private static final Logger logger = LoggerFactory.getLogger(DuplicateRequestConnection.class);
+public class RequestMirrorConnection implements ProxyConnection {
+    private static final Logger logger = LoggerFactory.getLogger(RequestMirrorConnection.class);
 
     private final HttpClient httpClient;
     private final Request originalRequest;
@@ -44,7 +44,7 @@ public class DuplicateRequestConnection implements ProxyConnection {
     private Buffer content;
     private String url = "";
 
-    public DuplicateRequestConnection(ExecutionContext executionContext, DuplicateRequestPolicyConfiguration configuration) {
+    public RequestMirrorConnection(ExecutionContext executionContext, RequestMirrorPolicyConfiguration configuration) {
         url = configuration.getUrl();
         originalRequest = executionContext.request();
         Vertx vertx = executionContext.getComponent(Vertx.class);
@@ -71,7 +71,7 @@ public class DuplicateRequestConnection implements ProxyConnection {
             HttpClientRequest clientRequest = httpClient.requestAbs(httpMethod, url, done -> {
                 logger.info("Response code: " + done.statusCode() + ", statusMessage: " + done.statusMessage() );
                 done.bodyHandler(buffer -> {
-                    logger.info("Body: " + buffer.getString(0, buffer.length()));
+                    logger.debug("Body: " + buffer.getString(0, buffer.length()));
                 });
             });
 
@@ -87,7 +87,7 @@ public class DuplicateRequestConnection implements ProxyConnection {
             });
 
             clientRequest.exceptionHandler(event -> {
-                logger.info("Server exception", event);
+                logger.error("Server exception", event);
             });
 
             if (!messageBody.isEmpty() && (originalRequest.method().equals(io.gravitee.common.http.HttpMethod.POST)
@@ -102,7 +102,7 @@ public class DuplicateRequestConnection implements ProxyConnection {
             logger.error("General exception: ", e);
         }
 
-        responseHandler.handle(new DuplicateRequestResponse());
+        responseHandler.handle(new RequestMirrorResponse());
     }
 
     @Override

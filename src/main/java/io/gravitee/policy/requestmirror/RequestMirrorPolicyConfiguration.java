@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.gravitee.policy.duplicaterequest;
+package io.gravitee.policy.requestmirror;
 
 import io.gravitee.policy.api.PolicyConfiguration;
-import io.gravitee.common.http.HttpMethod;
 
 @SuppressWarnings("unused")
-public class DuplicateRequestPolicyConfiguration implements PolicyConfiguration {
+public class RequestMirrorPolicyConfiguration implements PolicyConfiguration {
 
     /**
      * A String parameter
