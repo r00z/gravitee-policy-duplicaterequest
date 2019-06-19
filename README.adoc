@@ -1,4 +1,4 @@
-= DuplicateRequest Gravitee Policy
+= Mirror Request Gravitee Policy
 
 ifdef::env-github[]
 image:https://ci.gravitee.io/buildStatus/icon?job=gravitee-io/gravitee-policy-duplicaterequest/master["Build status", link="https://ci.gravitee.io/job/gravitee-io/job/gravitee-policy-duplicaterequest/"]
